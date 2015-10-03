@@ -24,9 +24,14 @@ def after_request(response):
     g.db.close()
     return response
 
-@app.route('/api/v1.0/ratings/<int:guid>', methods=['GET'])
-def get_ratings(guid):
+@app.route('/api/v1.0/ratings/rating/all/<int:guid>', methods=['GET'])
+def get_all_ratings_for_listing(guid):
     ratings = query_db("SELECT guid, rating, message FROM rating where guid = ?", [guid])
+    return jsonify({'rating': ratings})
+
+@app.route('/api/v1.0/ratings/rating/avg/<int:guid>', methods=['GET'])
+def get_average_rating(guid):
+    ratings = query_db("SELECT avg(rating) FROM rating where guid = ?", [guid])
     return jsonify({'rating': ratings})
 
 @app.route('/api/v1.0/ratings', methods=['POST'])
@@ -39,7 +44,19 @@ def create_rating():
     message = request.json['message']
     query_db("INSERT INTO rating (guid, rating, message) VALUES (?,?,?)", [guid, rating, message])
     g.db.commit()
-    return jsonify({'insert': "success"}), 201
+    return jsonify({'result': "success"}), 201
+
+# @app.route('/api/v1.0/ratings/<int:guid>', methods=['PUT'])
+# def update_rating(guid):
+#     if not request.json or not 'guid' in request.json:
+#         abort(400)
+
+#     guid = request.json['guid']
+#     rating = request.json['rating']
+#     message = request.json['message']
+#     query_db("UPDATE rating SET rating = ?, message = ? WHERE guid = ?", [rating, message, guid])
+#     g.db.commit()
+#     return jsonify({'result': "success"}), 201
 
 def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
