@@ -24,15 +24,23 @@ def after_request(response):
     g.db.close()
     return response
 
-@app.route('/api/v1.0/ratings/rating/all/<int:guid>', methods=['GET'])
+@app.route('/api/v1.0/ratings/rating/<int:guid>', methods=['GET'])
 def get_all_ratings_for_listing(guid):
     ratings = query_db("SELECT guid, rating, message FROM rating where guid = ?", [guid])
-    return jsonify({'rating': ratings})
+    avg = get_average_rating(guid)
 
-@app.route('/api/v1.0/ratings/rating/avg/<int:guid>', methods=['GET'])
+    avg_value = avg[0].get('avg')
+
+    data = {
+      'ratings': ratings,
+       'avg' : avg_value
+    }
+    resp = jsonify(data)
+    resp.status_code = 200
+    return resp
+
 def get_average_rating(guid):
-    ratings = query_db("SELECT avg(rating) FROM rating where guid = ?", [guid])
-    return jsonify({'rating': ratings})
+    return query_db("SELECT avg(rating) as avg FROM rating where guid = ?", [guid])
 
 @app.route('/api/v1.0/ratings/rating/<int:guid>', methods=['POST'])
 def create_rating(guid):
