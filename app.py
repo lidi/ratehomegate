@@ -46,18 +46,6 @@ def create_rating():
     g.db.commit()
     return jsonify({'result': "success"}), 201
 
-# @app.route('/api/v1.0/ratings/<int:guid>', methods=['PUT'])
-# def update_rating(guid):
-#     if not request.json or not 'guid' in request.json:
-#         abort(400)
-
-#     guid = request.json['guid']
-#     rating = request.json['rating']
-#     message = request.json['message']
-#     query_db("UPDATE rating SET rating = ?, message = ? WHERE guid = ?", [rating, message, guid])
-#     g.db.commit()
-#     return jsonify({'result': "success"}), 201
-
 def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
