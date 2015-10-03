@@ -31,6 +31,10 @@ def get_all_ratings_for_listing(guid):
 
     avg_value = avg[0].get('avg')
 
+    if avg_value is None:
+        avg_value = -1
+
+
     data = {
       'ratings': ratings,
        'avg' : avg_value
